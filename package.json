@@ -1,0 +1,24 @@
+{
+  "name": "istanbul-lib-processinfo",
+  "version": "1.0.0",
+  "description": "A utility for managing the `processinfo` folder that NYC uses.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap",
+    "snap": "tap"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/istanbuljs/istanbul-lib-processinfo.git"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "archy": "^1.0.0",
+    "istanbul-lib-coverage": "^2.0.3",
+    "rimraf": "^2.6.3",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "tap": "^13.0.0-rc.23"
+  }
+}
