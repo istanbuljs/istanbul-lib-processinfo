@@ -14,11 +14,15 @@
   "license": "ISC",
   "dependencies": {
     "archy": "^1.0.0",
+    "cross-spawn": "^6.0.5",
     "istanbul-lib-coverage": "^2.0.3",
     "rimraf": "^2.6.3",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
     "tap": "^13.0.0-rc.23"
+  },
+  "tap": {
+    "esm": false
   }
 }

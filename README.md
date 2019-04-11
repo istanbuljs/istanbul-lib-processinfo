@@ -118,6 +118,10 @@ WARNING: Calling `expunge` (which this method does) will result in the index
 being out of date.  It is the caller's responsibility to call
 `processDB.writeIndex()` when all named processes are completed.
 
+### processDB.spawnSync(name, file, args, options)
+
+Sync form of `processDB.spawn()`.
+
 ### processDB.expunge(name)
 
 If a process exists in the process info data folder with the specified name

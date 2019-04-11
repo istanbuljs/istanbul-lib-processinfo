@@ -2,14 +2,17 @@
 const uuid = require('uuid/v4')
 const archy = require('archy')
 const libCoverage = require('istanbul-lib-coverage')
-const path = require('path')
+const {basename, dirname, resolve} = require('path')
 const fs = require('fs')
-const {spawn} = require('child_process')
-const rimraf = require('rimraf')
+const {spawn, sync: spawnSync} = require('cross-spawn')
+const rimraf = require('rimraf').sync
 
+const _nodes = Symbol('nodes')
 const _label = Symbol('label')
 const _coverageMap = Symbol('coverageMap')
 const _processInfoDirectory = Symbol('processInfoDirectory')
+const _spawnArgs = Symbol('spawnArgs')
+const nycConfig = process.env.NYC_CONFIG
 
 // the enumerable fields
 const defaults = {
@@ -50,9 +53,9 @@ class ProcessInfo {
     }
 
     if (!this[_processInfoDirectory]) {
-      this[_processInfoDirectory] = path.resolve(
-        this.cwd, '.nyc_output', 'processinfo'
-      )
+      this[_processInfoDirectory] = nycConfig
+        ? resolve(JSON.parse(nycConfig).tempDir, 'processinfo')
+        : resolve(this.cwd, '.nyc_output', 'processinfo')
     }
   }
 
@@ -113,8 +116,11 @@ const mapMerger = (nyc, filenames, maps) => {
 // and the root of the tree rendering operation.
 class ProcessDB {
   constructor (dir) {
+    if (!dir && nycConfig) {
+      dir = JSON.parse(nycConfig).tempDir + '/processinfo'
+    }
     if (!dir) {
-      throw new TypeError('must provide dir argument')
+      throw new TypeError('must provide dir argument when outside of NYC')
     }
     Object.defineProperty(this, 'dir', { get: () => dir, enumerable: true })
     this.nodes = []
@@ -160,15 +166,16 @@ class ProcessDB {
     return fs.readdirSync(this.dir).filter(f => f !== 'index.json').map(f => {
       let data
       try {
-        data = JSON.parse(fs.readFileSync(path.resolve(dir, f), 'utf-8'))
+        data = JSON.parse(fs.readFileSync(resolve(dir, f), 'utf-8'))
       } catch (e) { // handle corrupt JSON output.
         return null
       }
       data.nodes = []
       data = new ProcessInfo(data)
-      return { file: path.basename(f, '.json'), data: data }
-    }).filter(Boolean).reduce((infos, info) => {
-      infos[info.file] = info.data
+      const file = basename(f, '.json')
+      return { file, data }
+    }).filter(Boolean).reduce((infos, {file, data}) => {
+      infos[file] = data
       return infos
     }, {})
   }
@@ -180,7 +187,7 @@ class ProcessDB {
     const eidToUid = new Map()
     const infos = fs.readdirSync(dir).filter(f => f !== 'index.json').map(f => {
       try {
-        const info = JSON.parse(fs.readFileSync(path.resolve(dir, f), 'utf-8'))
+        const info = JSON.parse(fs.readFileSync(resolve(dir, f), 'utf-8'))
         info.children = []
         pidToUid.set(info.uuid, info.pid)
         pidToUid.set(info.pid, info.uuid)
@@ -244,7 +251,7 @@ class ProcessDB {
       }
     })
 
-    const indexFile = path.resolve(dir, 'index.json')
+    const indexFile = resolve(dir, 'index.json')
     fs.writeFileSync(indexFile, JSON.stringify(index))
 
     return index
@@ -268,16 +275,15 @@ class ProcessDB {
     if (!entry) {
       return
     }
-    rimraf.sync(`${path.dirname(this.dir)}/${entry.root}.json`)
-    rimraf.sync(`${this.dir}/${entry.root}.json`)
+    rimraf(`${dirname(this.dir)}/${entry.root}.json`)
+    rimraf(`${this.dir}/${entry.root}.json`)
     entry.children.forEach(c => {
-      rimraf.sync(`${path.dirname(this.dir)}/${c}.json`)
-      rimraf.sync(`${this.dir}/${c}.json`)
+      rimraf(`${dirname(this.dir)}/${c}.json`)
+      rimraf(`${this.dir}/${c}.json`)
     })
   }
 
-  // spawn an externally named process
-  spawn (name, file, args, options) {
+  [_spawnArgs] (name, file, args, options) {
     if (!Array.isArray(args)) {
       options = args
       args = []
@@ -286,16 +292,38 @@ class ProcessDB {
       options = {}
     }
 
+    if (!nycConfig) {
+      args.unshift(file)
+      file = 'nyc'
+    }
+
     this.expunge(name)
     options.env = {
       ...(options.env || process.env),
       NYC_PROCESSINFO_EXTERNAL_ID: name,
     }
 
+    return [name, file, args, options]
+  }
+
+  // spawn an externally named process
+  spawn (...spawnArgs) {
+    const [name, file, args, options] = this[_spawnArgs](...spawnArgs)
     const proc = spawn(file, args, options)
 
     if (options.regenerateIndex) {
       proc.on('close', () => this.writeIndex())
+    }
+
+    return proc
+  }
+
+  spawnSync (...spawnArgs) {
+    const [name, file, args, options] = this[_spawnArgs](...spawnArgs)
+    const proc = spawnSync(file, args, options)
+
+    if (options.regenerateIndex) {
+      this.writeIndex()
     }
 
     return proc
