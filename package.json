@@ -24,5 +24,8 @@
   },
   "tap": {
     "esm": false
-  }
+  },
+  "files": [
+    "index.js"
+  ]
 }

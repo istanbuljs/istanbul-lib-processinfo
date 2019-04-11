@@ -1,0 +1,14 @@
+*
+.*
+
+!.gitignore
+!.travis.yml
+!test
+!index.js
+!tap-snapshots
+!README.md
+!LICENSE
+!CHANGELOG.md
+!CONTRIBUTING.md
+!package.json
+!package-lock.json
