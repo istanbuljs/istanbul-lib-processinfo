@@ -1,0 +1,44 @@
+{
+  "processes": {
+    "0f4e28ea-5b03-4677-8c0d-263e81b42f7e": {
+      "parent": null,
+      "children": [
+        "300fc62b-eaf2-4505-981b-39567e807f94",
+        "625ef291-93c0-40b2-a869-70587f7e8fac"
+      ]
+    },
+    "300fc62b-eaf2-4505-981b-39567e807f94": {
+      "parent": "0f4e28ea-5b03-4677-8c0d-263e81b42f7e",
+      "children": []
+    },
+    "625ef291-93c0-40b2-a869-70587f7e8fac": {
+      "parent": "0f4e28ea-5b03-4677-8c0d-263e81b42f7e",
+      "externalId": "named foo",
+      "children": [
+        "62c33964-203a-4e6a-b1ff-8a046eeb8912"
+      ]
+    },
+    "62c33964-203a-4e6a-b1ff-8a046eeb8912": {
+      "parent": "625ef291-93c0-40b2-a869-70587f7e8fac",
+      "children": []
+    }
+  },
+  "files": {
+    "test/fixtures/foo.js": [
+      "0f4e28ea-5b03-4677-8c0d-263e81b42f7e",
+      "625ef291-93c0-40b2-a869-70587f7e8fac"
+    ],
+    "test/fixtures/bar.js": [
+      "300fc62b-eaf2-4505-981b-39567e807f94",
+      "62c33964-203a-4e6a-b1ff-8a046eeb8912"
+    ]
+  },
+  "externalIds": {
+    "named foo": {
+      "root": "625ef291-93c0-40b2-a869-70587f7e8fac",
+      "children": [
+        "62c33964-203a-4e6a-b1ff-8a046eeb8912"
+      ]
+    }
+  }
+}

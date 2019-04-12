@@ -1,0 +1,19 @@
+{
+  "uuid": "625ef291-93c0-40b2-a869-70587f7e8fac",
+  "parent": "0f4e28ea-5b03-4677-8c0d-263e81b42f7e",
+  "pid": 60878,
+  "argv": [
+    "/usr/local/bin/node",
+    "test/fixtures/foo.js"
+  ],
+  "execArgv": [],
+  "cwd": "test/fixtures",
+  "time": 1555110276382,
+  "ppid": 60876,
+  "root": "de75ec1f-158d-4a45-bb19-525c293ce4bd",
+  "coverageFilename": "625ef291-93c0-40b2-a869-70587f7e8fac.json",
+  "externalId": "named foo",
+  "files": [
+    "test/fixtures/foo.js"
+  ]
+}

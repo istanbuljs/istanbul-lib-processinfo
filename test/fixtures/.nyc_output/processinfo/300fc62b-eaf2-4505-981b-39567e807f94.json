@@ -1,0 +1,18 @@
+{
+  "uuid": "300fc62b-eaf2-4505-981b-39567e807f94",
+  "parent": "0f4e28ea-5b03-4677-8c0d-263e81b42f7e",
+  "pid": 60877,
+  "argv": [
+    "/usr/local/bin/node",
+    "test/fixtures/bar.js"
+  ],
+  "execArgv": [],
+  "cwd": "test/fixtures",
+  "time": 1555110276283,
+  "ppid": 60876,
+  "root": "de75ec1f-158d-4a45-bb19-525c293ce4bd",
+  "coverageFilename": "300fc62b-eaf2-4505-981b-39567e807f94.json",
+  "files": [
+    "test/fixtures/bar.js"
+  ]
+}
