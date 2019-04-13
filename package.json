@@ -24,7 +24,8 @@
     "tap": "^13.0.0-rc.23"
   },
   "tap": {
-    "esm": false
+    "esm": false,
+    "jobs": 1
   },
   "files": [
     "index.js"

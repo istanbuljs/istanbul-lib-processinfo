@@ -80,6 +80,8 @@ t.test('render process tree', t => {
 
   const pdb = new ProcessDB(dir)
 
-  t.matchSnapshot(pdb.renderTree(nyc))
+  t.matchSnapshot(pdb.renderTree(nyc), 'render the tree')
+  t.matchSnapshot(pdb.getCoverageMap(), 'coverage map after render')
+  t.matchSnapshot(pdb.label, 'label after render')
   t.end()
 })

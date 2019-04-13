@@ -54,7 +54,6 @@ class ProcessInfo {
     }
 
     if (!this[_processInfoDirectory]) {
-      /* istanbul ignore next */
       this[_processInfoDirectory] = nycConfig
         ? resolve(JSON.parse(nycConfig).tempDir, 'processinfo')
         : resolve(this.cwd, '.nyc_output', 'processinfo')
@@ -122,7 +121,7 @@ const mapMerger = (nyc, filenames, maps) => {
 class ProcessDB {
   constructor (dir) {
     if (!dir && nycConfig) {
-      dir = JSON.parse(nycConfig).tempDir + '/processinfo'
+      dir = resolve(JSON.parse(nycConfig).tempDir, 'processinfo')
     }
     if (!dir) {
       throw new TypeError('must provide dir argument when outside of NYC')
@@ -130,8 +129,20 @@ class ProcessDB {
     mkdirp(dir)
     Object.defineProperty(this, 'dir', { get: () => dir, enumerable: true })
     this.nodes = []
-    this.label = 'nyc'
+    this[_label] = null
     this[_coverageMap] = null
+  }
+
+  get label () {
+    if (this[_label]) {
+      return this[_label]
+    }
+
+    const covInfo = this[_coverageMap]
+      ? '\n  ' + this[_coverageMap].getCoverageSummary().lines.pct + ' % Lines'
+      : ''
+
+    return this[_label] = 'nyc' + covInfo
   }
 
   getCoverageMap (nyc) {

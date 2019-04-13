@@ -62,7 +62,7 @@ t.test('nyc stuff', t => {
   })
   const cm = pi.getCoverageMap(nyc)
   t.matchSnapshot(cm)
-  const cm2 = pi.getCoverageMap()
+  const cm2 = pi.getCoverageMap(nyc)
   t.match(cm2, cm)
 
   t.matchSnapshot(pi.label)
