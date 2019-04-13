@@ -6,6 +6,7 @@ const {basename, dirname, resolve} = require('path')
 const fs = require('fs')
 const {spawn, sync: spawnSync} = require('cross-spawn')
 const rimraf = require('rimraf').sync
+const mkdirp = require('mkdirp').sync
 
 const _nodes = Symbol('nodes')
 const _label = Symbol('label')
@@ -53,10 +54,14 @@ class ProcessInfo {
     }
 
     if (!this[_processInfoDirectory]) {
+      /* istanbul ignore next */
       this[_processInfoDirectory] = nycConfig
         ? resolve(JSON.parse(nycConfig).tempDir, 'processinfo')
         : resolve(this.cwd, '.nyc_output', 'processinfo')
     }
+
+    this[_label] = null
+    this[_coverageMap] = null
   }
 
   get nodes () {
@@ -76,7 +81,7 @@ class ProcessInfo {
   }
 
   save () {
-    const f = this.processInfoDirectory() + '/' + this.uuid + '.json'
+    const f = this.processInfoDirectory + '/' + this.uuid + '.json'
     fs.writeFileSync(f, JSON.stringify(this), 'utf-8')
   }
 
@@ -122,6 +127,7 @@ class ProcessDB {
     if (!dir) {
       throw new TypeError('must provide dir argument when outside of NYC')
     }
+    mkdirp(dir)
     Object.defineProperty(this, 'dir', { get: () => dir, enumerable: true })
     this.nodes = []
     this.label = 'nyc'
