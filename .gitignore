@@ -1,5 +1,6 @@
 /*
 /.*
+/test/fixtures/node_modules
 
 !.gitignore
 !.travis.yml
