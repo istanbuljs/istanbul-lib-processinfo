@@ -20,6 +20,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "nyc": "^13.3.0",
     "tap": "^13.0.0-rc.23"
   },
   "tap": {
