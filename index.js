@@ -160,8 +160,8 @@ class ProcessDB {
         throw new Error(`Invalid entry in processinfo index: ${id}`)
       }
       const idx = index.processes[id]
-      node.nodes = idx.children.map(id =>
-        infos[id]).sort((a, b) => a.time - b.time)
+      node.nodes = idx.children.map(id => infos[id])
+        .sort((a, b) => a.time - b.time)
       if (!node.parent) {
         this.nodes.push(node)
       }
@@ -172,7 +172,7 @@ class ProcessDB {
     return fs.readdirSync(this.dir).filter(f => f !== 'index.json').map(f => {
       let data
       try {
-        data = JSON.parse(fs.readFileSync(resolve(dir, f), 'utf-8'))
+        data = JSON.parse(fs.readFileSync(resolve(this.dir, f), 'utf-8'))
       } catch (e) { // handle corrupt JSON output.
         return null
       }
@@ -207,7 +207,7 @@ class ProcessDB {
       }
     }).filter(Boolean)
 
-    // create all the parent-child links and write back the updated info
+    // create all the parent-child links
     infos.forEach(info => {
       if (info.parent) {
         const parentInfo = infoByUid.get(info.parent)
@@ -221,7 +221,9 @@ class ProcessDB {
     const files = infos.reduce((files, info) => {
       info.files.forEach(f => {
         files[f] = files[f] || []
-        files[f].push(info.uuid)
+        if (files[f].indexOf(info.uuid) === -1) {
+          files[f].push(info.uuid)
+        }
       })
       return files
     }, {})

@@ -14,5 +14,6 @@
   "coverageFilename": "0f4e28ea-5b03-4677-8c0d-263e81b42f7e.json",
   "files": [
     "test/fixtures/foo.js"
-  ]
+  ],
+  "externalId": "root process"
 }
