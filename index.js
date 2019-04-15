@@ -12,7 +12,8 @@ const _nodes = Symbol('nodes')
 const _label = Symbol('label')
 const _coverageMap = Symbol('coverageMap')
 const _processInfoDirectory = Symbol('processInfoDirectory')
-const _spawnArgs = Symbol('spawnArgs')
+// shared symbol for testing
+const _spawnArgs = Symbol.for('spawnArgs')
 const nycConfig = process.env.NYC_CONFIG
 
 // the enumerable fields
@@ -312,11 +313,12 @@ class ProcessDB {
     }
 
     if (!nycConfig) {
-      args.unshift(file)
-      file = 'nyc'
+      const nyc = options.nyc || 'nyc'
+      const nycArgs = options.nycArgs || []
+      args = [...nycArgs, file, ...args]
+      file = nyc
     }
 
-    this.expunge(name)
     options.env = {
       ...(options.env || process.env),
       NYC_PROCESSINFO_EXTERNAL_ID: name,
@@ -328,6 +330,7 @@ class ProcessDB {
   // spawn an externally named process
   spawn (...spawnArgs) {
     const [name, file, args, options] = this[_spawnArgs](...spawnArgs)
+    this.expunge(name)
     const proc = spawn(file, args, options)
 
     if (options.regenerateIndex) {
@@ -339,6 +342,7 @@ class ProcessDB {
 
   spawnSync (...spawnArgs) {
     const [name, file, args, options] = this[_spawnArgs](...spawnArgs)
+    this.expunge(name)
     const proc = spawnSync(file, args, options)
 
     if (options.regenerateIndex) {

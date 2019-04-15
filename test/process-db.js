@@ -85,3 +85,77 @@ t.test('render process tree', t => {
   t.matchSnapshot(pdb.label, 'label after render')
   t.end()
 })
+
+t.test('spawn', async t => {
+  const tempDir = __dirname + '/fixtures/.nyc_output'
+  const esc = path.resolve('escape.sh')
+  t.teardown(() => rimraf(esc))
+  fs.writeFileSync(esc, `#!/bin/bash
+nyc --show-process-tree --clean=false --temp-dir=${tempDir} "$@"
+`)
+  const ok = path.resolve('ok.js')
+  t.teardown(() => rimraf(ok))
+  fs.writeFileSync(ok, `
+if (process.argv[2] !== 'child') {
+  console.log('TAP version 13')
+  console.log('ok 1 - child {')
+  require('child_process').spawn(process.execPath, [__filename, 'child'], {
+    stdio: 'inherit'
+  }).on('close', () => console.log('}\\n1..1'))
+} else {
+  console.log('    1..1')
+  console.log('    ok')
+}
+`)
+
+  const node = process.execPath
+
+  const pdb = new ProcessDB(dir)
+
+  await new Promise(res => {
+    const c = pdb.spawn('named test', '/bin/bash', [esc, node, ok])
+    c.on('close', (code, signal) => {
+      t.equal(code, 0)
+      t.equal(signal, null)
+      res()
+    })
+  })
+
+  // got the named test in there
+  t.match(pdb.writeIndex(), { externalIds: { 'named test': Object } })
+  // expunges
+  pdb.spawnSync('named test', '/bin/bash', [esc, node, ok])
+  t.match(pdb.writeIndex(), { externalIds: { 'named test': Object } })
+  pdb.expunge('named test')
+  t.notMatch(pdb.writeIndex(), { externalIds: { 'named test': Object } })
+
+  // with the auto-index-rewriting
+  await new Promise(res => {
+    const c = pdb.spawn('named test', '/bin/bash', [esc, node, ok], {
+      regenerateIndex: true
+    })
+    c.on('close', (code, signal) => {
+      t.equal(code, 0)
+      t.equal(signal, null)
+      res()
+    })
+  })
+
+  // got the named test in there
+  t.match(pdb.readIndex(), { externalIds: { 'named test': Object } })
+  // expunges
+  pdb.spawnSync('named test', '/bin/bash', [esc, node, ok], {
+    regenerateIndex: true
+  })
+  t.match(pdb.readIndex(), { externalIds: { 'named test': Object } })
+  pdb.expunge('named test')
+  t.notMatch(pdb.writeIndex(), { externalIds: { 'named test': Object } })
+})
+
+t.test('spawn args parsing', t => {
+  const _spawnArgs = Symbol.for('spawnArgs')
+  const sa = ProcessDB.prototype[_spawnArgs]
+  t.match(sa('name', 'file', {some:'options'}), ['name', 'file', [], {some:'options'}])
+  t.match(sa('name', 'file'), ['name', 'file', [], {}])
+  t.end()
+})

@@ -32,5 +32,8 @@
   ],
   "nyc": {
     "include": "index.js"
+  },
+  "tap": {
+    "check-coverage": true
   }
 }
