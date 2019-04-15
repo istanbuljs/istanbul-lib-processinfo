@@ -27,16 +27,12 @@
     "tap": "^13.0.0-rc.23"
   },
   "tap": {
-    "esm": false,
-    "jobs": 1
+    "check-coverage": true
   },
   "files": [
     "index.js"
   ],
   "nyc": {
     "include": "index.js"
-  },
-  "tap": {
-    "check-coverage": true
   }
 }
