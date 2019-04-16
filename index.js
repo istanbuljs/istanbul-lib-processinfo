@@ -6,7 +6,7 @@ const {basename, dirname, resolve} = require('path')
 const fs = require('fs')
 const {spawn, sync: spawnSync} = require('cross-spawn')
 const rimraf = require('rimraf').sync
-const mkdirp = require('mkdirp').sync
+const mkdirp = require('make-dir').sync
 
 const _nodes = Symbol('nodes')
 const _label = Symbol('label')
