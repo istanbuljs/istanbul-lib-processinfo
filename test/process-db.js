@@ -1,3 +1,6 @@
+Object.prototype[require('util').inspect.custom] = function () {
+  return JSON.stringify(this, null, 2)
+}
 const t = require('tap')
 const {ProcessDB} = require('../')
 const uuidRe = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/
@@ -7,6 +10,7 @@ const fs = require('fs')
 const path = require('path')
 const dir = path.resolve(__dirname, 'fixtures/.nyc_output/processinfo')
 const indexFile = path.resolve(dir, 'index.json')
+const which = require('which')
 
 t.test('basic creation', t => {
   const pdb = new ProcessDB(dir)
@@ -86,13 +90,38 @@ t.test('render process tree', t => {
   t.end()
 })
 
-t.test('spawn', async t => {
+t.test('spawn', t => {
   const tempDir = __dirname + '/fixtures/.nyc_output'
-  const esc = path.resolve('escape.sh')
+  const esc = process.platform === 'win32'
+    ? path.resolve('escape.cmd')
+    : path.resolve('escape.sh')
   t.teardown(() => rimraf(esc))
-  fs.writeFileSync(esc, `#!/bin/bash
-nyc --show-process-tree --clean=false --temp-dir=${tempDir} "$@"
-`)
+  const node = process.execPath
+  const escapePath = `${path.dirname(node)}:${process.env.PATH}`
+  const nyc = require.resolve('nyc/bin/nyc.js')
+
+  const script = process.platform === 'win32'
+    ? `
+@SETLOCAL\r
+@SET PATH=${escapePath};%PATH%\r
+@SET NYC_CONFIG=\r
+@SET NYC_CWD=\r
+@SET NYC_ROOT_ID=\r
+@SET NYC_INSTRUMENTER=\r
+@SET NYC_CONFIG_OVERRIDE=\r
+@SET NYC_PROCESS_ID=\r
+${node} ${nyc} --show-process-tree --cache=false --clean=false --temp-dir=${tempDir} %*\r
+` : `#!/bin/bash
+export PATH=${escapePath}
+export NYC_CONFIG=
+export NYC_CWD=
+export NYC_ROOT_ID=
+export NYC_INSTRUMENTER=
+export NYC_CONFIG_OVERRIDE=
+export NYC_PROCESS_ID=
+${node} ${nyc} --show-process-tree --cache=false --clean=false --temp-dir=${tempDir} "$@"
+`
+  fs.writeFileSync(esc, script)
   const ok = path.resolve('ok.js')
   t.teardown(() => rimraf(ok))
   fs.writeFileSync(ok, `
@@ -108,48 +137,52 @@ if (process.argv[2] !== 'child') {
 }
 `)
 
-  const node = process.execPath
-
+  fs.chmodSync(esc, 0o755)
   const pdb = new ProcessDB(dir)
 
-  await new Promise(res => {
-    const c = pdb.spawn('named test', '/bin/bash', [esc, node, ok])
+  return new Promise(res => {
+    const c = pdb.spawn('named test', esc, [node, ok], {
+      stdio: ['ignore', 'ignore', 'inherit']
+    })
     c.on('close', (code, signal) => {
       t.equal(code, 0)
       t.equal(signal, null)
       res()
     })
-  })
+  }).then(() => {
+    // got the named test in there
+    t.match(pdb.writeIndex(), { externalIds: { 'named test': Object } })
+    // expunges
+    pdb.spawnSync('named test', esc, [node, ok], {
+      stdio: ['ignore', 'ignore', 'inherit']
+    })
+    t.match(pdb.writeIndex(), { externalIds: { 'named test': Object } })
+    pdb.expunge('named test')
+    t.notMatch(pdb.writeIndex(), { externalIds: { 'named test': Object } })
 
-  // got the named test in there
-  t.match(pdb.writeIndex(), { externalIds: { 'named test': Object } })
-  // expunges
-  pdb.spawnSync('named test', '/bin/bash', [esc, node, ok])
-  t.match(pdb.writeIndex(), { externalIds: { 'named test': Object } })
-  pdb.expunge('named test')
-  t.notMatch(pdb.writeIndex(), { externalIds: { 'named test': Object } })
-
-  // with the auto-index-rewriting
-  await new Promise(res => {
-    const c = pdb.spawn('named test', '/bin/bash', [esc, node, ok], {
+    // with the auto-index-rewriting
+    return new Promise(res => {
+      const c = pdb.spawn('named test', esc, [node, ok], {
+        regenerateIndex: true,
+        stdio: ['ignore', 'ignore', 'inherit']
+      })
+      c.on('close', (code, signal) => {
+        t.equal(code, 0)
+        t.equal(signal, null)
+        res()
+      })
+    })
+  }).then(() => {
+    // got the named test in there
+    t.match(pdb.readIndex(), { externalIds: { 'named test': Object } })
+    // expunges
+    pdb.spawnSync('named test', esc, [node, ok], {
       regenerateIndex: true
     })
-    c.on('close', (code, signal) => {
-      t.equal(code, 0)
-      t.equal(signal, null)
-      res()
-    })
+    t.match(pdb.readIndex(), { externalIds: { 'named test': Object } })
+    pdb.expunge('named test')
+    t.notMatch(pdb.writeIndex(), { externalIds: { 'named test': Object } })
   })
-
-  // got the named test in there
-  t.match(pdb.readIndex(), { externalIds: { 'named test': Object } })
-  // expunges
-  pdb.spawnSync('named test', '/bin/bash', [esc, node, ok], {
-    regenerateIndex: true
-  })
-  t.match(pdb.readIndex(), { externalIds: { 'named test': Object } })
-  pdb.expunge('named test')
-  t.notMatch(pdb.writeIndex(), { externalIds: { 'named test': Object } })
 })
 
 t.test('spawn args parsing', t => {

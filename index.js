@@ -319,10 +319,11 @@ class ProcessDB {
       file = nyc
     }
 
-    options.env = {
-      ...(options.env || process.env),
-      NYC_PROCESSINFO_EXTERNAL_ID: name,
-    }
+    options.env = Object.assign(
+      {},
+      (options.env || process.env),
+      { NYC_PROCESSINFO_EXTERNAL_ID: name }
+    )
 
     return [name, file, args, options]
   }

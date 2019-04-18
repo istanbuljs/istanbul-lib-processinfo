@@ -1,3 +1,6 @@
+Object.prototype[require('util').inspect.custom] = function () {
+  return JSON.stringify(this, null, 2)
+}
 const t = require('tap')
 const {ProcessInfo} = require('../')
 const uuidRe = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/
@@ -54,12 +57,11 @@ t.test('nyc stuff', t => {
   const cuuid = '62c33964-203a-4e6a-b1ff-8a046eeb8912'
   const file = `${__dirname}/fixtures/.nyc_output/processinfo/${uuid}.json`
   const child = `${__dirname}/fixtures/.nyc_output/processinfo/${cuuid}.json`
-  const pi = new ProcessInfo({
-    ...JSON.parse(fs.readFileSync(file, 'utf8')),
-    nodes: [
+  const pi = new ProcessInfo(Object.assign(
+    JSON.parse(fs.readFileSync(file, 'utf8')),
+    {nodes: [
       new ProcessInfo(JSON.parse(fs.readFileSync(child, 'utf8')))
-    ]
-  })
+    ]}))
   const cm = pi.getCoverageMap(nyc)
   t.matchSnapshot(cm)
   const cm2 = pi.getCoverageMap(nyc)

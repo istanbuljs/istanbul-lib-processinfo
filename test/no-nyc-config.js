@@ -1,3 +1,6 @@
+Object.prototype[require('util').inspect.custom] = function () {
+  return JSON.stringify(this, null, 2)
+}
 process.env.NYC_CONFIG = ''
 
 const {ProcessDB, ProcessInfo} = require('../')
@@ -13,7 +16,7 @@ t.throws(() => new ProcessDB(),
 t.equal(new ProcessInfo().processInfoDirectory,
   path.resolve('.nyc_output', 'processinfo'))
 
-t.test('spawnArgs from outside nyc', async t => {
+t.test('spawnArgs from outside nyc', t => {
   const _spawnArgs = Symbol.for('spawnArgs')
   const dir = path.resolve(__dirname, 'fixtures/.nyc_output/processinfo')
   const pdb = new ProcessDB(dir)
@@ -25,4 +28,5 @@ t.test('spawnArgs from outside nyc', async t => {
   t.matchSnapshot(pdb[_spawnArgs]('has no nyc', 'node', ['ok.js'], {
     env: { x: 'y' },
   }))
+  t.end()
 })
