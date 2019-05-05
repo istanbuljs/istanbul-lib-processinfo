@@ -71,7 +71,7 @@ class ProcessInfo {
   }
 
   set processInfoDirectory (d) {
-    this[_processInfoDirectory] = d
+    this[_processInfoDirectory] = resolve(d)
   }
 
   get processInfoDirectory () {
@@ -79,7 +79,7 @@ class ProcessInfo {
   }
 
   save () {
-    const f = this.processInfoDirectory + '/' + this.uuid + '.json'
+    const f = resolve(this.processInfoDirectory, this.uuid + '.json')
     fs.writeFileSync(f, JSON.stringify(this), 'utf-8')
   }
 
