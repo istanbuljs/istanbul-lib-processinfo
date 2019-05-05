@@ -27,10 +27,8 @@ const defaults = {
   ppid: process.ppid,
   root: null,
   coverageFilename: null,
-  externalId: process.env.NYC_PROCESSINFO_EXTERNAL_ID || '',
+  externalId: ''
 }
-
-delete process.env.NYC_PROCESSINFO_EXTERNAL_ID
 
 class ProcessInfo {
   constructor (fields) {
