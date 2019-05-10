@@ -149,7 +149,6 @@ ProcessInfo files MUST match the following structure:
   "execArgv": Array<String>,
   "cwd": path,
   "time": Number (timestamp in ms),
-  "root": "UUID of NYC process group",
   "coverageFilename": "Path to NYC coverage info for this process",
   "externalId": "The externally specified name for this process, or null",
 }

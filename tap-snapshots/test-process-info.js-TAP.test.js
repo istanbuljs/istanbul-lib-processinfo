@@ -25,7 +25,6 @@ exports[`test/process-info.js TAP basic creation > undefined 1`] = `
   ],
   "uuid": "a universally unique identifier",
   "parent": null,
-  "root": null,
   "coverageFilename": null
 }
 `

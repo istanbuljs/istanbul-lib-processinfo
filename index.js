@@ -25,7 +25,6 @@ const defaults = {
   cwd: process.cwd(),
   time: Date.now(),
   ppid: process.ppid,
-  root: null,
   coverageFilename: null,
   externalId: ''
 }
