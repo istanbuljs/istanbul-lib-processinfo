@@ -8,10 +8,9 @@ const fs = require('fs')
 const rimraf = require('rimraf').sync
 
 t.throws(() => new ProcessDB(),
-  new TypeError('must provide dir argument when outside of NYC'))
+  new TypeError('must provide directory argument when outside of NYC'))
 
-t.equal(new ProcessInfo().processInfoDirectory,
-  path.resolve('.nyc_output', 'processinfo'))
+t.equal(new ProcessInfo().directory, undefined)
 
 t.test('spawnArgs from outside nyc', t => {
   const _spawnArgs = Symbol.for('spawnArgs')

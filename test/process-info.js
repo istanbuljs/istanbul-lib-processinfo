@@ -9,7 +9,7 @@ const path = require('path')
 t.test('basic creation', t => {
   const pi = new ProcessInfo({
     foo: 'bar',
-    processInfoDirectory: '/some/path',
+    directory: '/some/path',
     time: 1234,
     cwd: '/some/cwd',
     pid: 420,
@@ -22,7 +22,7 @@ t.test('basic creation', t => {
   })
   t.matchSnapshot(pi)
   t.same(pi.nodes, [4, 2, 0])
-  t.equal(pi.processInfoDirectory, path.resolve('/some/path'))
+  t.equal(pi.directory, path.resolve('/some/path'))
   t.equal(pi.label, 'a b c')
   t.equal(pi.label, 'a b c', 'second time to cover memoization')
   t.match(new ProcessInfo().uuid, uuidRe)
@@ -34,7 +34,7 @@ t.test('save', t => {
   t.teardown(() => rimraf(file))
 
   const pi = new ProcessInfo({
-    processInfoDirectory: __dirname + '/fixtures/.nyc_output/processinfo',
+    directory: __dirname + '/fixtures/.nyc_output/processinfo',
     uuid: 'blerg',
   })
 
