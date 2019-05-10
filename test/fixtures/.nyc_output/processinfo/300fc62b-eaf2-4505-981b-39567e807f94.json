@@ -10,7 +10,6 @@
   "cwd": "test/fixtures",
   "time": 1555110276283,
   "ppid": 60876,
-  "root": "de75ec1f-158d-4a45-bb19-525c293ce4bd",
   "coverageFilename": "300fc62b-eaf2-4505-981b-39567e807f94.json",
   "files": [
     "test/fixtures/bar.js"

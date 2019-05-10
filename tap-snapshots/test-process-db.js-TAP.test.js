@@ -75,7 +75,6 @@ exports[`test/process-db.js TAP readProcessInfos > undefined 1`] = `
     "cwd": "test/fixtures",
     "time": 1555110275928,
     "ppid": 60875,
-    "root": "de75ec1f-158d-4a45-bb19-525c293ce4bd",
     "coverageFilename": "0f4e28ea-5b03-4677-8c0d-263e81b42f7e.json",
     "files": [
       "test/fixtures/foo.js"
@@ -94,7 +93,6 @@ exports[`test/process-db.js TAP readProcessInfos > undefined 1`] = `
     "cwd": "test/fixtures",
     "time": 1555110276283,
     "ppid": 60876,
-    "root": "de75ec1f-158d-4a45-bb19-525c293ce4bd",
     "coverageFilename": "300fc62b-eaf2-4505-981b-39567e807f94.json",
     "files": [
       "test/fixtures/bar.js"
@@ -113,7 +111,6 @@ exports[`test/process-db.js TAP readProcessInfos > undefined 1`] = `
     "cwd": "test/fixtures",
     "time": 1555110276382,
     "ppid": 60876,
-    "root": "de75ec1f-158d-4a45-bb19-525c293ce4bd",
     "coverageFilename": "625ef291-93c0-40b2-a869-70587f7e8fac.json",
     "externalId": "named foo",
     "files": [
@@ -132,7 +129,6 @@ exports[`test/process-db.js TAP readProcessInfos > undefined 1`] = `
     "cwd": "test/fixtures",
     "time": 1555110276750,
     "ppid": 60878,
-    "root": "de75ec1f-158d-4a45-bb19-525c293ce4bd",
     "coverageFilename": "62c33964-203a-4e6a-b1ff-8a046eeb8912.json",
     "files": [
       "test/fixtures/bar.js"
