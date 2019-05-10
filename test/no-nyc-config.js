@@ -1,6 +1,3 @@
-Object.prototype[require('util').inspect.custom] = function () {
-  return JSON.stringify(this, null, 2)
-}
 process.env.NYC_CONFIG = ''
 
 const {ProcessDB, ProcessInfo} = require('../')

@@ -5,41 +5,41 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/no-nyc-config.js TAP spawnArgs from outside nyc > undefined 1`] = `
-[
+exports[`test/no-nyc-config.js TAP spawnArgs from outside nyc > must match snapshot 1`] = `
+Array [
   "has an nyc",
   "/path/to/nyc",
-  [
+  Array [
     "--clean=false",
     "node",
-    "ok.js"
+    "ok.js",
   ],
-  {
-    "nyc": "/path/to/nyc",
-    "nycArgs": [
-      "--clean=false"
-    ],
-    "env": {
+  Object {
+    "env": Object {
+      "NYC_PROCESSINFO_EXTERNAL_ID": "has an nyc",
       "x": "y",
-      "NYC_PROCESSINFO_EXTERNAL_ID": "has an nyc"
-    }
-  }
+    },
+    "nyc": "/path/to/nyc",
+    "nycArgs": Array [
+      "--clean=false",
+    ],
+  },
 ]
 `
 
-exports[`test/no-nyc-config.js TAP spawnArgs from outside nyc > undefined 2`] = `
-[
+exports[`test/no-nyc-config.js TAP spawnArgs from outside nyc > must match snapshot 2`] = `
+Array [
   "has no nyc",
   "nyc",
-  [
+  Array [
     "node",
-    "ok.js"
+    "ok.js",
   ],
-  {
-    "env": {
+  Object {
+    "env": Object {
+      "NYC_PROCESSINFO_EXTERNAL_ID": "has no nyc",
       "x": "y",
-      "NYC_PROCESSINFO_EXTERNAL_ID": "has no nyc"
-    }
-  }
+    },
+  },
 ]
 `
