@@ -1,6 +1,3 @@
-Object.prototype[require('util').inspect.custom] = function () {
-  return JSON.stringify(this, null, 2)
-}
 const t = require('tap')
 const {ProcessDB} = require('../')
 const uuidRe = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/
@@ -10,7 +7,6 @@ const fs = require('fs')
 const path = require('path')
 const dir = path.resolve(__dirname, 'fixtures/.nyc_output/processinfo')
 const indexFile = path.resolve(dir, 'index.json')
-const which = require('which')
 
 t.test('basic creation', t => {
   const pdb = new ProcessDB(dir)

@@ -17,7 +17,7 @@ const _spawnArgs = Symbol.for('spawnArgs')
 const nycConfig = process.env.NYC_CONFIG
 
 // the enumerable fields
-const defaults = {
+const defaults = () => ({
   parent: null,
   pid: process.pid,
   argv: process.argv,
@@ -26,29 +26,18 @@ const defaults = {
   time: Date.now(),
   ppid: process.ppid,
   coverageFilename: null,
-  externalId: ''
-}
+  externalId: '',
+  [_nodes]: [],
+  [_label]: null,
+  [_coverageMap]: null
+})
 
 class ProcessInfo {
-  constructor (fields) {
-    fields = fields || {}
-
-    for (const key in fields) {
-      this[key] = fields[key]
-    }
-
-    for (const key in defaults) {
-      if (!(key in fields)) {
-        this[key] = defaults[key]
-      }
-    }
+  constructor (fields = {}) {
+    Object.assign(this, defaults(), fields)
 
     if (!this.uuid) {
       this.uuid = uuid()
-    }
-
-    if (!this[_nodes]) {
-      this[_nodes] = []
     }
 
     if (!this[_processInfoDirectory]) {
@@ -56,9 +45,6 @@ class ProcessInfo {
         ? resolve(JSON.parse(nycConfig).tempDir, 'processinfo')
         : resolve(this.cwd, '.nyc_output', 'processinfo')
     }
-
-    this[_label] = null
-    this[_coverageMap] = null
   }
 
   get nodes () {
@@ -230,7 +216,7 @@ class ProcessDB {
     const files = infos.reduce((files, info) => {
       info.files.forEach(f => {
         files[f] = files[f] || []
-        if (files[f].indexOf(info.uuid) === -1) {
+        if (!files[f].includes(info.uuid)) {
           files[f].push(info.uuid)
         }
       })
@@ -239,8 +225,9 @@ class ProcessDB {
 
     // build the actual index!
     const index = infos.reduce((index, info) => {
-      index.processes[info.uuid] = {}
-      index.processes[info.uuid].parent = info.parent
+      index.processes[info.uuid] = {
+        parent: info.parent
+      }
       if (info.externalId) {
         if (index.externalIds[info.externalId]) {
           throw new Error(
@@ -257,13 +244,12 @@ class ProcessDB {
     }, { processes: {}, files: files, externalIds: {} })
 
     // flatten the descendant sets of all the externalId procs
-    Object.keys(index.externalIds).forEach(eid => {
-      const { children } = index.externalIds[eid]
+    Object.values(index.externalIds).forEach(({children}) => {
       // push the next generation onto the list so we accumulate them all
       for (let i = 0; i < children.length; i++) {
         const nextGen = index.processes[children[i]].children
         if (nextGen && nextGen.length) {
-          children.push(...nextGen.filter(uuid => children.indexOf(uuid) === -1))
+          children.push(...nextGen.filter(uuid => !children.includes(uuid)))
         }
       }
     })
@@ -316,11 +302,10 @@ class ProcessDB {
       file = nyc
     }
 
-    options.env = Object.assign(
-      {},
-      (options.env || process.env),
-      { NYC_PROCESSINFO_EXTERNAL_ID: name }
-    )
+    options.env = {
+      ...(options.env || process.env),
+      NYC_PROCESSINFO_EXTERNAL_ID: name
+    }
 
     return [name, file, args, options]
   }

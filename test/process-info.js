@@ -1,6 +1,3 @@
-Object.prototype[require('util').inspect.custom] = function () {
-  return JSON.stringify(this, null, 2)
-}
 const t = require('tap')
 const {ProcessInfo} = require('../')
 const uuidRe = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/
