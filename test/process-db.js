@@ -5,30 +5,30 @@ const NYC = require('nyc')
 const rimraf = require('rimraf').sync
 const fs = require('fs')
 const path = require('path')
-const dir = path.resolve(__dirname, 'fixtures/.nyc_output/processinfo')
-const indexFile = path.resolve(dir, 'index.json')
+const directory = path.resolve(__dirname, 'fixtures/.nyc_output/processinfo')
+const indexFile = path.resolve(directory, 'index.json')
 
 t.test('basic creation', t => {
-  const pdb = new ProcessDB(dir)
-  pdb.dir = 'foo'
-  t.equal(pdb.dir, dir, 'dir is read-only')
+  const pdb = new ProcessDB(directory)
+  pdb.directory = 'foo'
+  t.equal(pdb.directory, directory, 'directory is read-only')
   t.equal(pdb.label, 'nyc')
   t.end()
 })
 
 t.test('writing and reading index', t => {
-  const pdb = new ProcessDB(dir)
+  const pdb = new ProcessDB(directory)
   rimraf(indexFile)
   t.throws(() => fs.readFileSync(indexFile))
 
   // put a borked json in there just for funsies
-  const bad = path.resolve(dir, 'gleepglorp.json')
+  const bad = path.resolve(directory, 'gleepglorp.json')
   fs.writeFileSync(bad, 'this is not json, it is bad')
   t.teardown(() => rimraf(bad))
 
   // this should never happen, but we are resilient against it anyway
-  const dupe = path.resolve(dir, 'duplicate.json')
-  const src = path.resolve(dir, '62c33964-203a-4e6a-b1ff-8a046eeb8912.json')
+  const dupe = path.resolve(directory, 'duplicate.json')
+  const src = path.resolve(directory, '62c33964-203a-4e6a-b1ff-8a046eeb8912.json')
   fs.writeFileSync(dupe, fs.readFileSync(src))
   t.teardown(() => rimraf(dupe))
 
@@ -37,34 +37,34 @@ t.test('writing and reading index', t => {
 })
 
 t.test('duplicate externalId throws', t => {
-  const dupe = path.resolve(dir, 'duplicate.json')
-  const src = path.resolve(dir, '625ef291-93c0-40b2-a869-70587f7e8fac.json')
+  const dupe = path.resolve(directory, 'duplicate.json')
+  const src = path.resolve(directory, '625ef291-93c0-40b2-a869-70587f7e8fac.json')
   fs.writeFileSync(dupe, fs.readFileSync(src))
   t.teardown(() => rimraf(dupe))
-  const pdb = new ProcessDB(dir)
+  const pdb = new ProcessDB(directory)
   t.throws(() => pdb.writeIndex())
   t.end()
 })
 
 t.test('readProcessInfos', t => {
   // put a borked json in there just for funsies
-  const bad = path.resolve(dir, 'gleepglorp.json')
+  const bad = path.resolve(directory, 'gleepglorp.json')
   fs.writeFileSync(bad, 'this is not json, it is bad')
   t.teardown(() => rimraf(bad))
 
-  const pdb = new ProcessDB(dir)
+  const pdb = new ProcessDB(directory)
   t.matchSnapshot(pdb.readProcessInfos())
   t.end()
 })
 
 t.test('buildProcessTree with invalid index', t => {
-  const pdb = new ProcessDB(dir)
+  const pdb = new ProcessDB(directory)
   t.teardown(() => pdb.writeIndex())
 
   const idx = pdb.readIndex()
   idx.processes.fleepflorp = { what: 'that mean' }
   const json = JSON.stringify(idx)
-  fs.writeFileSync(path.resolve(dir, 'index.json'), json)
+  fs.writeFileSync(path.resolve(directory, 'index.json'), json)
 
   t.throws(() => pdb.buildProcessTree(), {
     message: 'Invalid entry in processinfo index: fleepflorp'
@@ -78,7 +78,7 @@ t.test('render process tree', t => {
     cwd: path.resolve(__dirname + '/..'),
   })
 
-  const pdb = new ProcessDB(dir)
+  const pdb = new ProcessDB(directory)
 
   t.matchSnapshot(pdb.renderTree(nyc), 'render the tree')
   t.matchSnapshot(pdb.getCoverageMap(), 'coverage map after render')
@@ -134,7 +134,7 @@ if (process.argv[2] !== 'child') {
 `)
 
   fs.chmodSync(esc, 0o755)
-  const pdb = new ProcessDB(dir)
+  const pdb = new ProcessDB(directory)
 
   return new Promise(res => {
     const c = pdb.spawn('named test', esc, [node, ok], {

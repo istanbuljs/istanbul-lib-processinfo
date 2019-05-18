@@ -7,4 +7,4 @@ const {ProcessDB} = require('../')
 const t = require('tap')
 const path = require('path')
 
-t.equal(new ProcessDB().dir, path.resolve('processinfo'))
+t.equal(new ProcessDB().directory, path.resolve('processinfo'))

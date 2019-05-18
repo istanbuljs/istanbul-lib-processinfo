@@ -11,10 +11,9 @@ const mkdirp = require('make-dir').sync
 const _nodes = Symbol('nodes')
 const _label = Symbol('label')
 const _coverageMap = Symbol('coverageMap')
-const _processInfoDirectory = Symbol('processInfoDirectory')
+const _processInfoDirectory = Symbol('processInfo.directory')
 // shared symbol for testing
 const _spawnArgs = Symbol.for('spawnArgs')
-const nycConfig = process.env.NYC_CONFIG
 
 // the enumerable fields
 const defaults = () => ({
@@ -39,12 +38,6 @@ class ProcessInfo {
     if (!this.uuid) {
       this.uuid = uuid()
     }
-
-    if (!this[_processInfoDirectory]) {
-      this[_processInfoDirectory] = nycConfig
-        ? resolve(JSON.parse(nycConfig).tempDir, 'processinfo')
-        : resolve(this.cwd, '.nyc_output', 'processinfo')
-    }
   }
 
   get nodes () {
@@ -55,16 +48,16 @@ class ProcessInfo {
     this[_nodes] = n
   }
 
-  set processInfoDirectory (d) {
+  set directory (d) {
     this[_processInfoDirectory] = resolve(d)
   }
 
-  get processInfoDirectory () {
+  get directory () {
     return this[_processInfoDirectory]
   }
 
   save () {
-    const f = resolve(this.processInfoDirectory, this.uuid + '.json')
+    const f = resolve(this.directory, this.uuid + '.json')
     fs.writeFileSync(f, JSON.stringify(this), 'utf-8')
   }
 
@@ -103,15 +96,20 @@ const mapMerger = (nyc, filenames, maps) => {
 // Operations on the processinfo database as a whole,
 // and the root of the tree rendering operation.
 class ProcessDB {
-  constructor (dir) {
-    if (!dir && nycConfig) {
-      dir = resolve(JSON.parse(nycConfig).tempDir, 'processinfo')
+  constructor (directory) {
+    if (!directory) {
+      const nycConfig = process.env.NYC_CONFIG;
+      if (nycConfig) {
+        directory = resolve(JSON.parse(nycConfig).tempDir, 'processinfo')
+      }
+
+      if (!directory) {
+        throw new TypeError('must provide directory argument when outside of NYC')
+      }
     }
-    if (!dir) {
-      throw new TypeError('must provide dir argument when outside of NYC')
-    }
-    mkdirp(dir)
-    Object.defineProperty(this, 'dir', { get: () => dir, enumerable: true })
+
+    mkdirp(directory)
+    Object.defineProperty(this, 'directory', { get: () => directory, enumerable: true })
     this.nodes = []
     this[_label] = null
     this[_coverageMap] = null
@@ -147,7 +145,7 @@ class ProcessDB {
   }
 
   buildProcessTree () {
-    const infos = this.readProcessInfos(this.dir)
+    const infos = this.readProcessInfos(this.directory)
     const index = this.readIndex()
     for (const id in index.processes) {
       const node = infos[id]
@@ -164,10 +162,10 @@ class ProcessDB {
   }
 
   readProcessInfos () {
-    return fs.readdirSync(this.dir).filter(f => f !== 'index.json').map(f => {
+    return fs.readdirSync(this.directory).filter(f => f !== 'index.json').map(f => {
       let data
       try {
-        data = JSON.parse(fs.readFileSync(resolve(this.dir, f), 'utf-8'))
+        data = JSON.parse(fs.readFileSync(resolve(this.directory, f), 'utf-8'))
       } catch (e) { // handle corrupt JSON output.
         return null
       }
@@ -182,13 +180,13 @@ class ProcessDB {
   }
 
   writeIndex () {
-    const dir = this.dir
+    const {directory} = this
     const pidToUid = new Map()
     const infoByUid = new Map()
     const eidToUid = new Map()
-    const infos = fs.readdirSync(dir).filter(f => f !== 'index.json').map(f => {
+    const infos = fs.readdirSync(directory).filter(f => f !== 'index.json').map(f => {
       try {
-        const info = JSON.parse(fs.readFileSync(resolve(dir, f), 'utf-8'))
+        const info = JSON.parse(fs.readFileSync(resolve(directory, f), 'utf-8'))
         info.children = []
         pidToUid.set(info.uuid, info.pid)
         pidToUid.set(info.pid, info.uuid)
@@ -254,7 +252,7 @@ class ProcessDB {
       }
     })
 
-    const indexFile = resolve(dir, 'index.json')
+    const indexFile = resolve(directory, 'index.json')
     fs.writeFileSync(indexFile, JSON.stringify(index))
 
     return index
@@ -262,7 +260,7 @@ class ProcessDB {
 
   readIndex () {
     try {
-      return JSON.parse(fs.readFileSync(this.dir + '/index.json', 'utf-8'))
+      return JSON.parse(fs.readFileSync(resolve(this.directory, 'index.json'), 'utf-8'))
     } catch (e) {
       return this.writeIndex()
     }
@@ -278,11 +276,11 @@ class ProcessDB {
     if (!entry) {
       return
     }
-    rimraf(`${dirname(this.dir)}/${entry.root}.json`)
-    rimraf(`${this.dir}/${entry.root}.json`)
+    rimraf(`${dirname(this.directory)}/${entry.root}.json`)
+    rimraf(`${this.directory}/${entry.root}.json`)
     entry.children.forEach(c => {
-      rimraf(`${dirname(this.dir)}/${c}.json`)
-      rimraf(`${this.dir}/${c}.json`)
+      rimraf(`${dirname(this.directory)}/${c}.json`)
+      rimraf(`${this.directory}/${c}.json`)
     })
   }
 
@@ -295,7 +293,7 @@ class ProcessDB {
       options = {}
     }
 
-    if (!nycConfig) {
+    if (!process.env.NYC_CONFIG) {
       const nyc = options.nyc || 'nyc'
       const nycArgs = options.nycArgs || []
       args = [...nycArgs, file, ...args]
