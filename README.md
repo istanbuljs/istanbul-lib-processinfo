@@ -19,7 +19,7 @@ will be provided if not specified.
 #### processInfo.save()
 
 Write this process info to disk.  This works by passing the ProcessInfo object
-to JSON.stringify, and writing to `${nyc temp dir}/processinfo/${uuid}.json`.
+to JSON.stringify, and writing to `${this.directory}/${this.uuid}.json`.
 
 #### processInfo.getCoverageMap(nyc)
 
@@ -38,23 +38,22 @@ A read-only string for when archy prints the process tree.
 
 A list of the child nodes used during tree rendering.
 
-### processInfo.processInfoDirectory
+### processInfo.directory
 
-If a process will be saved, it ought to have a `processInfoDirectory` included
-in the list of fields.  The default is `${cwd}/.nyc_output/processinfo`.  This
-property is not saved to the processinfo file.
+If a process will be saved, it must have a `directory` included
+in the list of fields.  This property is not saved to the processinfo file.
 
 ## class ProcessDB
 
 A utility for interacting with the collection of ProcessInfo files in the
 processinfo folder.
 
-### constructor(dir)
+### constructor(directory)
 
 Supply the directory where processinfo files are found.  This should be the
 full path, something like `${cwd}/.nyc_output/processinfo`.
 
-### processDB.dir
+### processDB.directory
 
 A read-only property showing the directory where this object is working.
 
@@ -154,9 +153,7 @@ ProcessInfo files MUST match the following structure:
 }
 ```
 
-Each file is saved to `${nyc temp dir}/processinfo/${uuid}.json`.
-
-The index file is saved to `${nyc temp dir}/processinfo/index.json`.  It has
+The index file is saved to `${this.directory}/index.json`.  It has
 the following structure:
 
 ```
