@@ -29,7 +29,7 @@ t.test('basic creation', t => {
   t.end()
 })
 
-t.test('save', t => {
+t.test('saveSync', t => {
   const file = __dirname + '/fixtures/.nyc_output/processinfo/blerg.json'
   t.teardown(() => rimraf(file))
 
@@ -38,13 +38,27 @@ t.test('save', t => {
     uuid: 'blerg',
   })
 
-  pi.save()
+  pi.saveSync()
 
   t.match(pi, JSON.parse(fs.readFileSync(file, 'utf8')))
   t.end()
 })
 
-t.test('nyc stuff', t => {
+t.test('save', async t => {
+  const file = __dirname + '/fixtures/.nyc_output/processinfo/blerg.json'
+  t.teardown(() => rimraf(file))
+
+  const pi = new ProcessInfo({
+    directory: __dirname + '/fixtures/.nyc_output/processinfo',
+    uuid: 'blerg',
+  })
+
+  await pi.save()
+
+  t.match(pi, JSON.parse(fs.readFileSync(file, 'utf8')))
+})
+
+t.test('nyc stuff', async t => {
   const nyc = new NYC({
     tempDir: __dirname + '/fixtures/.nyc_output',
     cwd: path.resolve(__dirname + '/..'),
@@ -59,11 +73,10 @@ t.test('nyc stuff', t => {
     {nodes: [
       new ProcessInfo(JSON.parse(fs.readFileSync(child, 'utf8')))
     ]}))
-  const cm = pi.getCoverageMap(nyc)
+  const cm = await pi.getCoverageMap(nyc)
   t.matchSnapshot(cm)
-  const cm2 = pi.getCoverageMap(nyc)
+  const cm2 = await pi.getCoverageMap(nyc)
   t.match(cm2, cm)
 
   t.matchSnapshot(pi.label)
-  t.end()
 })
