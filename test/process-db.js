@@ -16,7 +16,7 @@ t.test('basic creation', t => {
   t.end()
 })
 
-t.test('writing and reading index', t => {
+t.test('writing and reading index', async t => {
   const pdb = new ProcessDB(directory)
   rimraf(indexFile)
   t.throws(() => fs.readFileSync(indexFile))
@@ -32,47 +32,43 @@ t.test('writing and reading index', t => {
   fs.writeFileSync(dupe, fs.readFileSync(src))
   t.teardown(() => rimraf(dupe))
 
-  t.matchSnapshot(pdb.readIndex())
-  t.end()
+  t.matchSnapshot(await pdb.readIndex())
 })
 
-t.test('duplicate externalId throws', t => {
+t.test('duplicate externalId throws', async t => {
   const dupe = path.resolve(directory, 'duplicate.json')
   const src = path.resolve(directory, '625ef291-93c0-40b2-a869-70587f7e8fac.json')
   fs.writeFileSync(dupe, fs.readFileSync(src))
   t.teardown(() => rimraf(dupe))
   const pdb = new ProcessDB(directory)
-  t.throws(() => pdb.writeIndex())
-  t.end()
+  await t.rejects(pdb.writeIndex())
 })
 
-t.test('readProcessInfos', t => {
+t.test('readProcessInfos', async t => {
   // put a borked json in there just for funsies
   const bad = path.resolve(directory, 'gleepglorp.json')
   fs.writeFileSync(bad, 'this is not json, it is bad')
   t.teardown(() => rimraf(bad))
 
   const pdb = new ProcessDB(directory)
-  t.matchSnapshot(pdb.readProcessInfos())
-  t.end()
+  t.matchSnapshot(await pdb.readProcessInfos())
 })
 
-t.test('buildProcessTree with invalid index', t => {
+t.test('buildProcessTree with invalid index', async t => {
   const pdb = new ProcessDB(directory)
   t.teardown(() => pdb.writeIndex())
 
-  const idx = pdb.readIndex()
+  const idx = await pdb.readIndex()
   idx.processes.fleepflorp = { what: 'that mean' }
   const json = JSON.stringify(idx)
   fs.writeFileSync(path.resolve(directory, 'index.json'), json)
 
-  t.throws(() => pdb.buildProcessTree(), {
+  await t.rejects(pdb.buildProcessTree(), {
     message: 'Invalid entry in processinfo index: fleepflorp'
   })
-  t.end()
 })
 
-t.test('render process tree', t => {
+t.test('render process tree', async t => {
   const nyc = new NYC({
     tempDir: __dirname + '/fixtures/.nyc_output',
     cwd: path.resolve(__dirname + '/..'),
@@ -80,13 +76,12 @@ t.test('render process tree', t => {
 
   const pdb = new ProcessDB(directory)
 
-  t.matchSnapshot(pdb.renderTree(nyc), 'render the tree')
-  t.matchSnapshot(pdb.getCoverageMap(), 'coverage map after render')
+  t.matchSnapshot(await pdb.renderTree(nyc), 'render the tree')
+  t.matchSnapshot(await pdb.getCoverageMap(), 'coverage map after render')
   t.matchSnapshot(pdb.label, 'label after render')
-  t.end()
 })
 
-t.test('spawn', t => {
+t.test('spawn', async t => {
   const tempDir = __dirname + '/fixtures/.nyc_output'
   const esc = process.platform === 'win32'
     ? path.resolve('escape.cmd')
@@ -136,49 +131,23 @@ if (process.argv[2] !== 'child') {
   fs.chmodSync(esc, 0o755)
   const pdb = new ProcessDB(directory)
 
-  return new Promise(res => {
-    const c = pdb.spawn('named test', esc, [node, ok], {
-      stdio: ['ignore', 'ignore', 'inherit']
-    })
+  const c = await pdb.spawn('named test', esc, [node, ok], {
+    stdio: ['ignore', 'ignore', 'inherit']
+  })
+
+  await new Promise(resolve => {
     c.on('close', (code, signal) => {
       t.equal(code, 0)
       t.equal(signal, null)
-      res()
+      resolve()
     })
-  }).then(() => {
-    // got the named test in there
-    t.match(pdb.writeIndex(), { externalIds: { 'named test': Object } })
-    // expunges
-    pdb.spawnSync('named test', esc, [node, ok], {
-      stdio: ['ignore', 'ignore', 'inherit']
-    })
-    t.match(pdb.writeIndex(), { externalIds: { 'named test': Object } })
-    pdb.expunge('named test')
-    t.notMatch(pdb.writeIndex(), { externalIds: { 'named test': Object } })
-
-    // with the auto-index-rewriting
-    return new Promise(res => {
-      const c = pdb.spawn('named test', esc, [node, ok], {
-        regenerateIndex: true,
-        stdio: ['ignore', 'ignore', 'inherit']
-      })
-      c.on('close', (code, signal) => {
-        t.equal(code, 0)
-        t.equal(signal, null)
-        res()
-      })
-    })
-  }).then(() => {
-    // got the named test in there
-    t.match(pdb.readIndex(), { externalIds: { 'named test': Object } })
-    // expunges
-    pdb.spawnSync('named test', esc, [node, ok], {
-      regenerateIndex: true
-    })
-    t.match(pdb.readIndex(), { externalIds: { 'named test': Object } })
-    pdb.expunge('named test')
-    t.notMatch(pdb.writeIndex(), { externalIds: { 'named test': Object } })
   })
+
+  // got the named test in there
+  t.match(await pdb.writeIndex(), { externalIds: { 'named test': Object } })
+
+  await pdb.expunge('named test')
+  t.notMatch(await pdb.writeIndex(), { externalIds: { 'named test': Object } })
 })
 
 t.test('spawn args parsing', t => {

@@ -2,11 +2,13 @@
 const uuid = require('uuid/v4')
 const archy = require('archy')
 const libCoverage = require('istanbul-lib-coverage')
-const {basename, dirname, resolve} = require('path')
-const fs = require('fs')
-const {spawn, sync: spawnSync} = require('cross-spawn')
-const rimraf = require('rimraf').sync
-const mkdirp = require('make-dir').sync
+const {dirname, resolve} = require('path')
+const {promisify} = require('util')
+/* Shallow clone so we can promisify in-place */
+const fs = { ...require('fs') }
+const {spawn} = require('cross-spawn')
+const rimraf = promisify(require('rimraf'))
+const pMap = require('p-map')
 
 const _nodes = Symbol('nodes')
 const _label = Symbol('label')
@@ -14,6 +16,10 @@ const _coverageMap = Symbol('coverageMap')
 const _processInfoDirectory = Symbol('processInfo.directory')
 // shared symbol for testing
 const _spawnArgs = Symbol.for('spawnArgs')
+
+;['writeFile', 'readFile', 'readdir'].forEach(fn => {
+  fs[fn] = promisify(fs[fn])
+})
 
 // the enumerable fields
 const defaults = () => ({
@@ -30,6 +36,14 @@ const defaults = () => ({
   [_label]: null,
   [_coverageMap]: null
 })
+
+/* istanbul ignore next */
+const fromEntries = Object.fromEntries || (
+  entries => entries.reduce((obj, [name, value]) => {
+    obj[name] = value
+    return obj
+  }, {})
+)
 
 class ProcessInfo {
   constructor (fields = {}) {
@@ -56,19 +70,24 @@ class ProcessInfo {
     return this[_processInfoDirectory]
   }
 
-  save () {
+  saveSync () {
     const f = resolve(this.directory, this.uuid + '.json')
     fs.writeFileSync(f, JSON.stringify(this), 'utf-8')
   }
 
-  getCoverageMap (nyc) {
+  async save () {
+    const f = resolve(this.directory, this.uuid + '.json')
+    await fs.writeFile(f, JSON.stringify(this), 'utf-8')
+  }
+
+  async getCoverageMap (nyc) {
     if (this[_coverageMap]) {
       return this[_coverageMap]
     }
 
-    const childMaps = this.nodes.map(child => child.getCoverageMap(nyc))
+    const childMaps = await Promise.all(this.nodes.map(child => child.getCoverageMap(nyc)))
 
-    this[_coverageMap] = mapMerger(nyc, [this.coverageFilename], childMaps)
+    this[_coverageMap] = await mapMerger(nyc, [this.coverageFilename], childMaps)
 
     return this[_coverageMap]
   }
@@ -86,7 +105,7 @@ class ProcessInfo {
   }
 }
 
-const mapMerger = (nyc, filenames, maps) => {
+const mapMerger = async (nyc, filenames, maps) => {
   const map = libCoverage.createCoverageMap({})
   nyc.eachReport(filenames, report => map.merge(report))
   maps.forEach(otherMap => map.merge(otherMap))
@@ -108,7 +127,6 @@ class ProcessDB {
       }
     }
 
-    mkdirp(directory)
     Object.defineProperty(this, 'directory', { get: () => directory, enumerable: true })
     this.nodes = []
     this[_label] = null
@@ -127,26 +145,26 @@ class ProcessDB {
     return this[_label] = 'nyc' + covInfo
   }
 
-  getCoverageMap (nyc) {
+  async getCoverageMap (nyc) {
     if (this[_coverageMap]) {
       return this[_coverageMap]
     }
 
-    const childMaps = this.nodes.map(child => child.getCoverageMap(nyc))
-    this[_coverageMap] = mapMerger(nyc, [], childMaps)
+    const childMaps = await Promise.all(this.nodes.map(child => child.getCoverageMap(nyc)))
+    this[_coverageMap] = await mapMerger(nyc, [], childMaps)
     return this[_coverageMap]
   }
 
-  renderTree (nyc) {
-    this.buildProcessTree()
-    this.getCoverageMap(nyc)
+  async renderTree (nyc) {
+    await this.buildProcessTree()
+    await this.getCoverageMap(nyc)
 
     return archy(this)
   }
 
-  buildProcessTree () {
-    const infos = this.readProcessInfos(this.directory)
-    const index = this.readIndex()
+  async buildProcessTree () {
+    const infos = await this.readProcessInfos(this.directory)
+    const index = await this.readIndex()
     for (const id in index.processes) {
       const node = infos[id]
       if (!node) {
@@ -161,49 +179,42 @@ class ProcessDB {
     }
   }
 
-  readProcessInfos () {
-    return fs.readdirSync(this.directory).filter(f => f !== 'index.json').map(f => {
-      let data
-      try {
-        data = JSON.parse(fs.readFileSync(resolve(this.directory, f), 'utf-8'))
-      } catch (e) { // handle corrupt JSON output.
-        return null
-      }
-      data.nodes = []
-      data = new ProcessInfo(data)
-      const file = basename(f, '.json')
-      return { file, data }
-    }).filter(Boolean).reduce((infos, {file, data}) => {
-      infos[file] = data
-      return infos
-    }, {})
+  async _readJSON (file) {
+    if (Array.isArray(file)) {
+      const result = await pMap(
+        file,
+        f => this._readJSON(f),
+        { concurrency: 8 }
+      )
+      return result.filter(Boolean)
+    }
+
+    try {
+      return JSON.parse(await fs.readFile(resolve(this.directory, file), 'utf-8'))
+    } catch (error) {
+    }
   }
 
-  writeIndex () {
-    const {directory} = this
-    const pidToUid = new Map()
-    const infoByUid = new Map()
-    const eidToUid = new Map()
-    const infos = fs.readdirSync(directory).filter(f => f !== 'index.json').map(f => {
-      try {
-        const info = JSON.parse(fs.readFileSync(resolve(directory, f), 'utf-8'))
-        info.children = []
-        pidToUid.set(info.uuid, info.pid)
-        pidToUid.set(info.pid, info.uuid)
-        infoByUid.set(info.uuid, info)
-        if (info.externalId) {
-          eidToUid.set(info.externalId, info.uuid)
-        }
-        return info
-      } catch (er) {
-        return null
-      }
-    }).filter(Boolean)
+  async readProcessInfos () {
+    const files = await fs.readdir(this.directory)
+    const fileData = await this._readJSON(files.filter(f => f !== 'index.json'))
+
+    return fromEntries(fileData.map(info => [
+      info.uuid,
+      new ProcessInfo(info)
+    ]))
+  }
+
+  _createIndex (infos) {
+    const infoMap = fromEntries(infos.map(info => [
+      info.uuid,
+      Object.assign(info, {children: []})
+    ]))
 
     // create all the parent-child links
     infos.forEach(info => {
       if (info.parent) {
-        const parentInfo = infoByUid.get(info.parent)
+        const parentInfo = infoMap[info.parent]
         if (parentInfo && !parentInfo.children.includes(info.uuid)) {
           parentInfo.children.push(info.uuid)
         }
@@ -221,67 +232,81 @@ class ProcessDB {
       return files
     }, {})
 
-    // build the actual index!
-    const index = infos.reduce((index, info) => {
-      index.processes[info.uuid] = {
-        parent: info.parent
+    const processes = fromEntries(infos.map(info => [
+      info.uuid,
+      {
+        parent: info.parent,
+        ...(info.externalId ? { externalId: info.externalId } : {}),
+        children: Array.from(info.children)
       }
-      if (info.externalId) {
-        if (index.externalIds[info.externalId]) {
-          throw new Error(
-            `External ID ${info.externalId} used by multiple processes`)
-        }
-        index.processes[info.uuid].externalId = info.externalId
-        index.externalIds[info.externalId] = {
-          root: info.uuid,
-          children: info.children
-        }
-      }
-      index.processes[info.uuid].children = Array.from(info.children)
-      return index
-    }, { processes: {}, files: files, externalIds: {} })
+    ]))
 
-    // flatten the descendant sets of all the externalId procs
-    Object.values(index.externalIds).forEach(({children}) => {
+    const eidList = new Set()
+    const externalIds = fromEntries(infos.filter(info => info.externalId).map(info => {
+      if (eidList.has(info.externalId)) {
+        throw new Error(
+          `External ID ${info.externalId} used by multiple processes`)
+      }
+
+      eidList.add(info.externalId)
+
+      const children = Array.from(info.children)
+      // flatten the descendant sets of all the externalId procs
       // push the next generation onto the list so we accumulate them all
       for (let i = 0; i < children.length; i++) {
-        const nextGen = index.processes[children[i]].children
-        if (nextGen && nextGen.length) {
-          children.push(...nextGen.filter(uuid => !children.includes(uuid)))
-        }
+        children.push(...processes[children[i]].children.filter(uuid => !children.includes(uuid)))
       }
-    })
 
+      return [
+        info.externalId,
+        {
+          root: info.uuid,
+          children
+        }
+      ]
+    }))
+
+    return { processes, files, externalIds }
+  }
+
+  async writeIndex () {
+    const {directory} = this
+    const files = await fs.readdir(directory)
+    const infos = await this._readJSON(files.filter(f => f !== 'index.json'))
+    const index = this._createIndex(infos)
     const indexFile = resolve(directory, 'index.json')
-    fs.writeFileSync(indexFile, JSON.stringify(index))
+    await fs.writeFile(indexFile, JSON.stringify(index))
 
     return index
   }
 
-  readIndex () {
-    try {
-      return JSON.parse(fs.readFileSync(resolve(this.directory, 'index.json'), 'utf-8'))
-    } catch (e) {
-      return this.writeIndex()
-    }
+  async readIndex () {
+    return await this._readJSON('index.json') || await this.writeIndex()
   }
 
   // delete all coverage and processinfo for a given process
   // Warning!  Doing this makes the index out of date, so make sure
   // to update it when you're done!
   // Not multi-process safe, because it cannot be done atomically.
-  expunge (id) {
-    const index = this.readIndex()
+  async expunge (id) {
+    const index = await this.readIndex()
     const entry = index.externalIds[id]
     if (!entry) {
       return
     }
-    rimraf(`${dirname(this.directory)}/${entry.root}.json`)
-    rimraf(`${this.directory}/${entry.root}.json`)
-    entry.children.forEach(c => {
-      rimraf(`${dirname(this.directory)}/${c}.json`)
-      rimraf(`${this.directory}/${c}.json`)
-    })
+
+    await pMap(
+      [].concat(
+        `${dirname(this.directory)}/${entry.root}.json`,
+        `${this.directory}/${entry.root}.json`,
+        ...entry.children.map(c => [
+          `${dirname(this.directory)}/${c}.json`,
+          `${this.directory}/${c}.json`
+        ])
+      ),
+      f => rimraf(f),
+      { concurrency: 8 }
+    )
   }
 
   [_spawnArgs] (name, file, args, options) {
@@ -309,28 +334,10 @@ class ProcessDB {
   }
 
   // spawn an externally named process
-  spawn (...spawnArgs) {
+  async spawn (...spawnArgs) {
     const [name, file, args, options] = this[_spawnArgs](...spawnArgs)
-    this.expunge(name)
-    const proc = spawn(file, args, options)
-
-    if (options.regenerateIndex) {
-      proc.on('close', () => this.writeIndex())
-    }
-
-    return proc
-  }
-
-  spawnSync (...spawnArgs) {
-    const [name, file, args, options] = this[_spawnArgs](...spawnArgs)
-    this.expunge(name)
-    const proc = spawnSync(file, args, options)
-
-    if (options.regenerateIndex) {
-      this.writeIndex()
-    }
-
-    return proc
+    await this.expunge(name)
+    return spawn(file, args, options)
   }
 }
 

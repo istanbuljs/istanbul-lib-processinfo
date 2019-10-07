@@ -16,12 +16,16 @@ A representation of information about a single process.
 Pass in fields that will be printed to the processinfo file.  Several defaults
 will be provided if not specified.
 
-#### processInfo.save()
+#### async processInfo.save()
 
 Write this process info to disk.  This works by passing the ProcessInfo object
 to JSON.stringify, and writing to `${this.directory}/${this.uuid}.json`.
 
-#### processInfo.getCoverageMap(nyc)
+#### processInfo.saveSync()
+
+The synchronous version of `.save()`.
+
+#### async processInfo.getCoverageMap(nyc)
 
 Get a merged coverage map of the current process, as well as any child
 processes.  This should only be called during tree rendering, as it depends on
@@ -65,38 +69,39 @@ A list of child ProcessInfo nodes used in tree printing.
 
 The string `'nyc'`, used as the default root node in the archy tree rendering.
 
-### processDB.writeIndex()
+### async processDB.writeIndex()
 
 Create the `index.json` file in the processinfo folder, which is required for
 tree generation and expunging.
 
-WARNING: Index writing is non-atomic, and should not be performed by multiple 
+WARNING: Index writing is non-atomic, and should not be performed by multiple
+processes.
 
-### processDB.readIndex()
+### async processDB.readIndex()
 
 Read and return the contents of the `index.json` file.  If the `index.json` is
 not present or not valid, then it will attempt to generate one.
 
-### processDB.readProcessInfos()
+### async processDB.readProcessInfos()
 
 Read all the data files in the processinfo folder, and return an object mapping
 the file basename to the resulting object.  Used in tree generation.
 
-### processDB.renderTree(nyc)
+### async processDB.renderTree(nyc)
 
 Render the tree as a string using archy, suitable for printing to the terminal.
 
-### processDB.buildProcessTree()
+### async processDB.buildProcessTree()
 
 Build the hierarchical tree of nodes for tree rendering.  Populates the `nodes`
 array of this object and all `ProcessInfo` objects in the tree.
 
-### processDB.getCoverageMap(nyc)
+### async processDB.getCoverageMap(nyc)
 
 Used in tree rendering, to show the total coverage of all the processinfo files
 in the data folder.
 
-### processDB.spawn(name, file, args, options)
+### async processDB.spawn(name, file, args, options)
 
 Spawn a child process with a unique name provided by the caller.  This name is
 stored as the `externalId` property in the child process's `ProcessInfo` data,
@@ -110,18 +115,14 @@ example, instead of `processDB.spawn('foo', 'node', ['foo.js'])`, you would run
 If a process with that name already exists in the index, then it will be
 expunged.
 
-If `options.regenerateIndex` is `true`, then ProcessDB will re-write the index
-when the process is completed.
+Unlike `child_process.spawn` this function returns a Promise which resolves to
+the `ChildProcess` object.
 
 WARNING: Calling `expunge` (which this method does) will result in the index
 being out of date.  It is the caller's responsibility to call
 `processDB.writeIndex()` when all named processes are completed.
 
-### processDB.spawnSync(name, file, args, options)
-
-Sync form of `processDB.spawn()`.
-
-### processDB.expunge(name)
+### async processDB.expunge(name)
 
 If a process exists in the process info data folder with the specified name
 (ie, it had previously been run with `processDB.spawn(name, ...)`) then the
