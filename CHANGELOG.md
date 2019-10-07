@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.1](https://github.com/istanbuljs/istanbul-lib-processinfo/compare/v2.0.0...v2.0.1) (2019-10-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* ProcessInfo#save is now async
+* ProcessInfo#getCoverageMap is now async
+* ProcessDB#writeIndex is now async
+* ProcessDB#readIndex is now async
+* ProcessDB#readProcessInfos is now async
+* ProcessDB#renderTree is now async
+* ProcessDB#buildProcessTree is now async
+* ProcessDB#getCoverageMap is now async
+* ProcessDB#spawn now returns a Promise which resolves to
+the child process object
+* ProcessDB#spawnSync has been removed
+* ProcessDB#expunge is now async
+
+### Bug Fixes
+
+* Update dependencies ([e52e64e](https://github.com/istanbuljs/istanbul-lib-processinfo/commit/e52e64e))
+
+
+### Features
+
+* Use async where possible ([#14](https://github.com/istanbuljs/istanbul-lib-processinfo/issues/14)) ([67378ab](https://github.com/istanbuljs/istanbul-lib-processinfo/commit/67378ab))
+
 ## [2.0.0](https://github.com/istanbuljs/istanbul-lib-processinfo/compare/v1.0.0...v2.0.0) (2019-06-20)
 
 
