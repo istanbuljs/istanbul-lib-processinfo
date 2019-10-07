@@ -87,7 +87,7 @@ class ProcessInfo {
 
     const childMaps = await Promise.all(this.nodes.map(child => child.getCoverageMap(nyc)))
 
-    this[_coverageMap] = await mapMerger(nyc, [this.coverageFilename], childMaps)
+    this[_coverageMap] = await mapMerger(nyc, this.coverageFilename, childMaps)
 
     return this[_coverageMap]
   }
@@ -105,9 +105,11 @@ class ProcessInfo {
   }
 }
 
-const mapMerger = async (nyc, filenames, maps) => {
+const mapMerger = async (nyc, filename, maps) => {
   const map = libCoverage.createCoverageMap({})
-  nyc.eachReport(filenames, report => map.merge(report))
+  if (filename) {
+    map.merge(await nyc.coverageFileLoad(filename))
+  }
   maps.forEach(otherMap => map.merge(otherMap))
   return map
 }
@@ -151,7 +153,7 @@ class ProcessDB {
     }
 
     const childMaps = await Promise.all(this.nodes.map(child => child.getCoverageMap(nyc)))
-    this[_coverageMap] = await mapMerger(nyc, [], childMaps)
+    this[_coverageMap] = await mapMerger(nyc, undefined, childMaps)
     return this[_coverageMap]
   }
 
