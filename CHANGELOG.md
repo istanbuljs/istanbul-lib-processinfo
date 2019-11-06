@@ -2,9 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [2.0.2](https://github.com/istanbuljs/istanbul-lib-processinfo/compare/v2.0.1...v2.0.2) (2019-10-08)
+## [2.0.2](https://github.com/istanbuljs/istanbul-lib-processinfo/compare/v2.0.1...v2.0.2) (2019-10-08)
 
-### [2.0.1](https://github.com/istanbuljs/istanbul-lib-processinfo/compare/v2.0.0...v2.0.1) (2019-10-07)
+
+### Changes
+
+* Update to use async API's from nyc@15 ([#15](https://github.com/istanbuljs/istanbul-lib-processinfo/issues/15)) ([987f36b](https://github.com/istanbuljs/istanbul-lib-processinfo/commit/987f36b))
+
+## [2.0.1](https://github.com/istanbuljs/istanbul-lib-processinfo/compare/v2.0.0...v2.0.1) (2019-10-07)
 
 
 ### ⚠ BREAKING CHANGES
