@@ -1,3 +1,4 @@
+'use strict'
 const t = require('tap')
 const {ProcessDB} = require('../')
 const uuidRe = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/
@@ -10,7 +11,9 @@ const indexFile = path.resolve(directory, 'index.json')
 
 t.test('basic creation', t => {
   const pdb = new ProcessDB(directory)
-  pdb.directory = 'foo'
+  t.throws(() => {
+    pdb.directory = 'foo'
+  }, TypeError)
   t.equal(pdb.directory, directory, 'directory is read-only')
   t.equal(pdb.label, 'nyc')
   t.end()

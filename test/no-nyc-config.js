@@ -1,3 +1,4 @@
+'use strict'
 process.env.NYC_CONFIG = ''
 
 const {ProcessDB, ProcessInfo} = require('../')
