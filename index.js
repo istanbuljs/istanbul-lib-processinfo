@@ -1,5 +1,6 @@
 'use strict'
-const { v4: uuid } = require('uuid')
+// const { v4: uuid } = require('uuid')
+const uuid = require('uuid/v4')
 const archy = require('archy')
 const libCoverage = require('istanbul-lib-coverage')
 const {dirname, resolve} = require('path')
