@@ -24,7 +24,7 @@
   "devDependencies": {
     "nyc": "^15.0.0-alpha.0",
     "standard-version": "^7.0.0",
-    "tap": "^15.0.9"
+    "tap": "^14.7.0"
   },
   "engines": {
     "node": ">=8"
