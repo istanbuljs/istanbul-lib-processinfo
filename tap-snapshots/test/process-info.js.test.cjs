@@ -231,5 +231,5 @@ CoverageMap {
 
 exports[`test/process-info.js TAP nyc stuff > must match snapshot 2`] = `
 /usr/local/bin/node test/fixtures/foo.js
-  71.43 % Lines
+  71.42 % Lines
 `

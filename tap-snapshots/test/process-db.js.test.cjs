@@ -284,20 +284,20 @@ CoverageMap {
 
 exports[`test/process-db.js TAP render process tree > label after render 1`] = `
 nyc
-  71.43 % Lines
+  71.42 % Lines
 `
 
 exports[`test/process-db.js TAP render process tree > render the tree 1`] = `
 nyc
-│   71.43 % Lines
+│   71.42 % Lines
 └─┬ /usr/local/bin/node test/fixtures/foo.test.js
-  │   71.43 % Lines
+  │   71.42 % Lines
   ├── /usr/local/bin/node test/fixtures/bar.js
-  │     66.67 % Lines
+  │     66.66 % Lines
   └─┬ /usr/local/bin/node test/fixtures/foo.js
-    │   71.43 % Lines
+    │   71.42 % Lines
     └── /usr/local/bin/node test/fixtures/bar.js
-          66.67 % Lines
+          66.66 % Lines
 
 `
 
