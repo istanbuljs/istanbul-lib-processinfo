@@ -1,5 +1,5 @@
 'use strict'
-const { v4: uuidv4 } = require('uuid');
+const {randomUUID} = require('crypto')
 const archy = require('archy')
 const libCoverage = require('istanbul-lib-coverage')
 const {dirname, resolve} = require('path')
@@ -50,7 +50,7 @@ class ProcessInfo {
     Object.assign(this, defaults(), fields)
 
     if (!this.uuid) {
-      this.uuid = uuidv4()
+      this.uuid = randomUUID()
     }
   }
 
