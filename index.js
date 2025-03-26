@@ -7,7 +7,7 @@ const {promisify} = require('util')
 /* Shallow clone so we can promisify in-place */
 const fs = { ...require('fs') }
 const {spawn} = require('cross-spawn')
-const rimraf = promisify(require('rimraf'))
+const rimraf = require('rimraf')
 const pMap = require('p-map')
 
 const _nodes = Symbol('nodes')
