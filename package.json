@@ -27,7 +27,7 @@
     "nyc": "^15.1.0"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=14"
   },
   "tap": {
     "check-coverage": true,
