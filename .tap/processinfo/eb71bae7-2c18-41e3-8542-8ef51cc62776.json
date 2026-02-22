@@ -1,0 +1,28 @@
+{
+  "date": "2026-02-22T17:50:44.387Z",
+  "argv": [
+    "/Users/benjamincoe/.nvm/versions/node/v20.19.0/bin/node",
+    "/Users/benjamincoe/oss/istanbul-lib-processinfo/node_modules/nyc/bin/nyc.js",
+    "--show-process-tree",
+    "--cache=false",
+    "--clean=false",
+    "--temp-dir=/Users/benjamincoe/oss/istanbul-lib-processinfo/test/fixtures/.nyc_output",
+    "/Users/benjamincoe/.nvm/versions/node/v20.19.0/bin/node",
+    "/Users/benjamincoe/oss/istanbul-lib-processinfo/ok.js"
+  ],
+  "execArgv": [],
+  "NODE_OPTIONS": "\"--import=file:///Users/benjamincoe/oss/istanbul-lib-processinfo/node_modules/@tapjs/processinfo/dist/esm/import.mjs\"",
+  "cwd": "/Users/benjamincoe/oss/istanbul-lib-processinfo",
+  "pid": 62967,
+  "ppid": 62966,
+  "parent": "c3f1999b-0a68-47a3-a81e-9eb0e120c02d",
+  "uuid": "eb71bae7-2c18-41e3-8542-8ef51cc62776",
+  "files": [
+    "/Users/benjamincoe/oss/istanbul-lib-processinfo/node_modules/nyc/bin/nyc.js"
+  ],
+  "sources": {},
+  "root": "c3f1999b-0a68-47a3-a81e-9eb0e120c02d",
+  "code": 0,
+  "signal": null,
+  "runtime": 455.718584
+}

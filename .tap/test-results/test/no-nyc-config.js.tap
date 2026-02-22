@@ -1,0 +1,10 @@
+TAP version 14
+ok 1 - expected to throw
+ok 2 - should be equal
+# Subtest: spawnArgs from outside nyc
+    ok 1 - must match snapshot
+    ok 2 - must match snapshot
+    1..2
+ok 3 - spawnArgs from outside nyc # time=9.765ms
+
+1..3

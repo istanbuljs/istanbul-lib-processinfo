@@ -1,0 +1,365 @@
+{
+  "result": [
+    {
+      "scriptId": "577",
+      "url": "file:///Users/benjamincoe/oss/istanbul-lib-processinfo/index.js",
+      "functions": [
+        {
+          "functionName": "",
+          "ranges": [
+            {
+              "startOffset": 0,
+              "endOffset": 8825,
+              "count": 1
+            },
+            {
+              "startOffset": 1103,
+              "endOffset": 1209,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": true
+        },
+        {
+          "functionName": "",
+          "ranges": [
+            {
+              "startOffset": 688,
+              "endOffset": 726,
+              "count": 3
+            }
+          ],
+          "isBlockCoverage": true
+        },
+        {
+          "functionName": "defaults",
+          "ranges": [
+            {
+              "startOffset": 771,
+              "endOffset": 1035,
+              "count": 1
+            }
+          ],
+          "isBlockCoverage": true
+        },
+        {
+          "functionName": "fromEntries",
+          "ranges": [
+            {
+              "startOffset": 1110,
+              "endOffset": 1207,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "ProcessInfo",
+          "ranges": [
+            {
+              "startOffset": 1233,
+              "endOffset": 1364,
+              "count": 1
+            }
+          ],
+          "isBlockCoverage": true
+        },
+        {
+          "functionName": "get nodes",
+          "ranges": [
+            {
+              "startOffset": 1368,
+              "endOffset": 1410,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "set nodes",
+          "ranges": [
+            {
+              "startOffset": 1414,
+              "endOffset": 1454,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "set directory",
+          "ranges": [
+            {
+              "startOffset": 1458,
+              "endOffset": 1526,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "get directory",
+          "ranges": [
+            {
+              "startOffset": 1530,
+              "endOffset": 1591,
+              "count": 1
+            }
+          ],
+          "isBlockCoverage": true
+        },
+        {
+          "functionName": "saveSync",
+          "ranges": [
+            {
+              "startOffset": 1595,
+              "endOffset": 1726,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "save",
+          "ranges": [
+            {
+              "startOffset": 1730,
+              "endOffset": 1865,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "getCoverageMap",
+          "ranges": [
+            {
+              "startOffset": 1869,
+              "endOffset": 2174,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "get label",
+          "ranges": [
+            {
+              "startOffset": 2178,
+              "endOffset": 2440,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "mapMerger",
+          "ranges": [
+            {
+              "startOffset": 2462,
+              "endOffset": 2679,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "ProcessDB",
+          "ranges": [
+            {
+              "startOffset": 2804,
+              "endOffset": 3294,
+              "count": 2
+            },
+            {
+              "startOffset": 2850,
+              "endOffset": 3126,
+              "count": 1
+            },
+            {
+              "startOffset": 2921,
+              "endOffset": 3004,
+              "count": 0
+            },
+            {
+              "startOffset": 3126,
+              "endOffset": 3293,
+              "count": 1
+            }
+          ],
+          "isBlockCoverage": true
+        },
+        {
+          "functionName": "get",
+          "ranges": [
+            {
+              "startOffset": 3180,
+              "endOffset": 3195,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "get label",
+          "ranges": [
+            {
+              "startOffset": 3298,
+              "endOffset": 3546,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "getCoverageMap",
+          "ranges": [
+            {
+              "startOffset": 3550,
+              "endOffset": 3841,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "renderTree",
+          "ranges": [
+            {
+              "startOffset": 3845,
+              "endOffset": 3966,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "buildProcessTree",
+          "ranges": [
+            {
+              "startOffset": 3970,
+              "endOffset": 4471,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "_readJSON",
+          "ranges": [
+            {
+              "startOffset": 4475,
+              "endOffset": 4812,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "readProcessInfos",
+          "ranges": [
+            {
+              "startOffset": 4816,
+              "endOffset": 5079,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "_createIndex",
+          "ranges": [
+            {
+              "startOffset": 5083,
+              "endOffset": 6872,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "writeIndex",
+          "ranges": [
+            {
+              "startOffset": 6876,
+              "endOffset": 7227,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "readIndex",
+          "ranges": [
+            {
+              "startOffset": 7231,
+              "endOffset": 7328,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "expunge",
+          "ranges": [
+            {
+              "startOffset": 7564,
+              "endOffset": 8045,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        },
+        {
+          "functionName": "",
+          "ranges": [
+            {
+              "startOffset": 8049,
+              "endOffset": 8544,
+              "count": 2
+            },
+            {
+              "startOffset": 8122,
+              "endOffset": 8166,
+              "count": 0
+            },
+            {
+              "startOffset": 8185,
+              "endOffset": 8211,
+              "count": 0
+            },
+            {
+              "startOffset": 8278,
+              "endOffset": 8286,
+              "count": 1
+            },
+            {
+              "startOffset": 8325,
+              "endOffset": 8330,
+              "count": 1
+            },
+            {
+              "startOffset": 8438,
+              "endOffset": 8452,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": true
+        },
+        {
+          "functionName": "spawn",
+          "ranges": [
+            {
+              "startOffset": 8587,
+              "endOffset": 8757,
+              "count": 0
+            }
+          ],
+          "isBlockCoverage": false
+        }
+      ]
+    }
+  ],
+  "timestamp": 222116.944834,
+  "source-map-cache": {}
+}
