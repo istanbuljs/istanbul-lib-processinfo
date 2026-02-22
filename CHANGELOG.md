@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/istanbuljs/istanbul-lib-processinfo/compare/istanbul-lib-processinfo-v2.0.0...istanbul-lib-processinfo-v3.0.0) (2026-02-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** Node 20 || >=22 now required
+* **deps:** Node 20 || >=22 now required
+* **deps:** Node 20 || >=22 now required
+
+### Bug Fixes
+
+* **deps:** update ancient deps addressing issues with minimatch / glob ([9a3f412](https://github.com/istanbuljs/istanbul-lib-processinfo/commit/9a3f412ac6681989a334f55ed3fac1cf5f54c1c2))
+* **deps:** update deps addressing CVEs ([c2f8cf9](https://github.com/istanbuljs/istanbul-lib-processinfo/commit/c2f8cf971db74930b0b9a4685852dab5726758eb))
+* **deps:** update deps addressing CVEs ([e167c5f](https://github.com/istanbuljs/istanbul-lib-processinfo/commit/e167c5ff4259e4251272e62ff80c498a9d2f25f8))
+
 ## [2.0.2](https://github.com/istanbuljs/istanbul-lib-processinfo/compare/v2.0.1...v2.0.2) (2019-10-08)
 
 
