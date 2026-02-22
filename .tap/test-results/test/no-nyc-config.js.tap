@@ -5,6 +5,6 @@ ok 2 - should be equal
     ok 1 - must match snapshot
     ok 2 - must match snapshot
     1..2
-ok 3 - spawnArgs from outside nyc # time=9.765ms
+ok 3 - spawnArgs from outside nyc # time=9.619ms
 
 1..3
