@@ -134,9 +134,14 @@ if (process.argv[2] !== 'child') {
   fs.chmodSync(esc, 0o755)
   const pdb = new ProcessDB(directory)
 
+  // Simulate being inside nyc so _spawnArgs doesn't double-wrap with nyc.
+  // The escape script clears NYC_CONFIG itself before invoking nyc directly.
+  const savedNYCConfig = process.env.NYC_CONFIG
+  process.env.NYC_CONFIG = JSON.stringify({ tempDir })
   const c = await pdb.spawn('named test', esc, [node, ok], {
     stdio: ['ignore', 'ignore', 'inherit']
   })
+  process.env.NYC_CONFIG = savedNYCConfig
 
   await new Promise(resolve => {
     c.on('close', (code, signal) => {
@@ -156,7 +161,11 @@ if (process.argv[2] !== 'child') {
 t.test('spawn args parsing', t => {
   const _spawnArgs = Symbol.for('spawnArgs')
   const sa = ProcessDB.prototype[_spawnArgs]
+  // simulate running inside nyc by setting NYC_CONFIG
+  const savedNYCConfig = process.env.NYC_CONFIG
+  process.env.NYC_CONFIG = '{"tempDir":"/tmp"}'
   t.match(sa('name', 'file', {some:'options'}), ['name', 'file', [], {some:'options'}])
   t.match(sa('name', 'file'), ['name', 'file', [], {}])
+  process.env.NYC_CONFIG = savedNYCConfig
   t.end()
 })

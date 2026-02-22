@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/process-db.js TAP readProcessInfos > must match snapshot 1`] = `
+exports[`test/process-db.js > TAP > readProcessInfos > must match snapshot 1`] = `
 Object {
   "0f4e28ea-5b03-4677-8c0d-263e81b42f7e": ProcessInfo {
     "argv": Array [
@@ -22,6 +22,9 @@ Object {
     "parent": null,
     "pid": 60876,
     "ppid": 60875,
+    [Symbol(coverageMap)]: null,
+    [Symbol(label)]: null,
+    [Symbol(nodes)]: Array [],
     "time": 1555110275928,
     "uuid": "0f4e28ea-5b03-4677-8c0d-263e81b42f7e",
   },
@@ -40,6 +43,9 @@ Object {
     "parent": "0f4e28ea-5b03-4677-8c0d-263e81b42f7e",
     "pid": 60877,
     "ppid": 60876,
+    [Symbol(coverageMap)]: null,
+    [Symbol(label)]: null,
+    [Symbol(nodes)]: Array [],
     "time": 1555110276283,
     "uuid": "300fc62b-eaf2-4505-981b-39567e807f94",
   },
@@ -58,6 +64,9 @@ Object {
     "parent": "0f4e28ea-5b03-4677-8c0d-263e81b42f7e",
     "pid": 60878,
     "ppid": 60876,
+    [Symbol(coverageMap)]: null,
+    [Symbol(label)]: null,
+    [Symbol(nodes)]: Array [],
     "time": 1555110276382,
     "uuid": "625ef291-93c0-40b2-a869-70587f7e8fac",
   },
@@ -76,13 +85,16 @@ Object {
     "parent": "625ef291-93c0-40b2-a869-70587f7e8fac",
     "pid": 60879,
     "ppid": 60878,
+    [Symbol(coverageMap)]: null,
+    [Symbol(label)]: null,
+    [Symbol(nodes)]: Array [],
     "time": 1555110276750,
     "uuid": "62c33964-203a-4e6a-b1ff-8a046eeb8912",
   },
 }
 `
 
-exports[`test/process-db.js TAP render process tree > coverage map after render 1`] = `
+exports[`test/process-db.js > TAP > render process tree > coverage map after render 1`] = `
 CoverageMap {
   "data": Null Object {
     "test/fixtures/bar.js": FileCoverage {
@@ -282,12 +294,12 @@ CoverageMap {
 }
 `
 
-exports[`test/process-db.js TAP render process tree > label after render 1`] = `
+exports[`test/process-db.js > TAP > render process tree > label after render 1`] = `
 nyc
   71.42 % Lines
 `
 
-exports[`test/process-db.js TAP render process tree > render the tree 1`] = `
+exports[`test/process-db.js > TAP > render process tree > render the tree 1`] = `
 nyc
 │   71.42 % Lines
 └─┬ /usr/local/bin/node test/fixtures/foo.test.js
@@ -301,7 +313,7 @@ nyc
 
 `
 
-exports[`test/process-db.js TAP writing and reading index > must match snapshot 1`] = `
+exports[`test/process-db.js > TAP > writing and reading index > must match snapshot 1`] = `
 Object {
   "externalIds": Object {
     "named foo": Object {

@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/no-nyc-config.js TAP spawnArgs from outside nyc > must match snapshot 1`] = `
+exports[`test/no-nyc-config.js > TAP > spawnArgs from outside nyc > must match snapshot 1`] = `
 Array [
   "has an nyc",
   "/path/to/nyc",
@@ -27,7 +27,7 @@ Array [
 ]
 `
 
-exports[`test/no-nyc-config.js TAP spawnArgs from outside nyc > must match snapshot 2`] = `
+exports[`test/no-nyc-config.js > TAP > spawnArgs from outside nyc > must match snapshot 2`] = `
 Array [
   "has no nyc",
   "nyc",

@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/process-info.js TAP basic creation > must match snapshot 1`] = `
+exports[`test/process-info.js > TAP > basic creation > must match snapshot 1`] = `
 ProcessInfo {
   "argv": Array [
     "a",
@@ -24,12 +24,20 @@ ProcessInfo {
   "parent": null,
   "pid": 420,
   "ppid": 69,
+  [Symbol(coverageMap)]: null,
+  [Symbol(label)]: null,
+  [Symbol(nodes)]: Array [
+    4,
+    2,
+    0,
+  ],
+  [Symbol(processInfo.directory)]: "/some/path",
   "time": 1234,
   "uuid": "a universally unique identifier",
 }
 `
 
-exports[`test/process-info.js TAP nyc stuff > must match snapshot 1`] = `
+exports[`test/process-info.js > TAP > nyc stuff > must match snapshot 1`] = `
 CoverageMap {
   "data": Null Object {
     "test/fixtures/bar.js": FileCoverage {
@@ -229,7 +237,7 @@ CoverageMap {
 }
 `
 
-exports[`test/process-info.js TAP nyc stuff > must match snapshot 2`] = `
+exports[`test/process-info.js > TAP > nyc stuff > must match snapshot 2`] = `
 /usr/local/bin/node test/fixtures/foo.js
   71.42 % Lines
 `
