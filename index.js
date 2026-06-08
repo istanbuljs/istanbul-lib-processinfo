@@ -37,6 +37,7 @@ const defaults = () => ({
   [_coverageMap]: null
 })
 
+/* c8 ignore start */
 /* istanbul ignore next */
 const fromEntries = Object.fromEntries || (
   entries => entries.reduce((obj, [name, value]) => {
@@ -44,6 +45,7 @@ const fromEntries = Object.fromEntries || (
     return obj
   }, {})
 )
+/* c8 ignore stop */
 
 class ProcessInfo {
   constructor (fields = {}) {
